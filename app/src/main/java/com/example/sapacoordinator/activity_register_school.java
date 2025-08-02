@@ -1,5 +1,6 @@
 package com.example.sapacoordinator;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -41,16 +42,23 @@ public class activity_register_school extends AppCompatActivity {
             String schoolName = etSchoolName.getText().toString().trim();
             String address = etAddress.getText().toString().trim();
             String contactInfo = etContactInfo.getText().toString().trim();
-//            int userId = /* retrieve from logged-in session or intent */;
+            SharedPreferences prefs = getSharedPreferences("UserSession", MODE_PRIVATE);
+            int userId = prefs.getInt("user_id", -1); // -1 if not found
 
-//            if (schoolName.isEmpty() || address.isEmpty()) {
-//                new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-//                        .setTitleText("Missing Fields")
-//                        .setContentText("Please fill all required fields.")
-//                        .show();
-//            } else {
-//                addSchool(schoolName, address, contactInfo, userId);
-//            }
+            if (userId == -1) {
+                new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText("Error")
+                        .setContentText("User session expired. Please log in again.")
+                        .show();
+            }
+            if (schoolName.isEmpty() || address.isEmpty()) {
+                new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                        .setTitleText("Missing Fields")
+                        .setContentText("Please fill all required fields.")
+                        .show();
+            } else {
+                addSchool(schoolName, address, contactInfo, userId);
+            }
         });
     }
     private void addSchool(String school_name, String school_address, String contact_info, int user_id) {

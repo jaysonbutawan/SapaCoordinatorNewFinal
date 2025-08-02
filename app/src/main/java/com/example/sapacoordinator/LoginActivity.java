@@ -3,6 +3,7 @@ import com.example.sapacoordinator.R;
 import com.google.gson.Gson;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -75,6 +76,11 @@ public class LoginActivity extends AppCompatActivity {
 
                     GenericResponse res = response.body();
                     if (res.isSuccess()) {
+                        int userId = res.getUserId(); // You'll add getter in GenericResponse
+
+                        // Save to SharedPreferences
+                        SharedPreferences prefs = getSharedPreferences("UserSession", MODE_PRIVATE);
+                        prefs.edit().putInt("user_id", userId).apply();
                         new SweetAlertDialog(LoginActivity.this, SweetAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("Welcome!")
                                 .setContentText(res.getMessage())
