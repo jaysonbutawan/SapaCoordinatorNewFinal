@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -15,13 +17,30 @@
         android:theme="@style/Theme.SapaCoordinator"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".HospitalComponents.TimeSlotsComponents.SelectStudentActivity"
+            android:exported="false" />
+        <activity android:name=".HospitalComponents.TimeSlotsComponents.DateTimeSlotSelectionActivity" />
+        <activity android:name=".HospitalComponents.DepartmentComponents.DepartmentActivity" />
+        <activity
+            android:name=".HospitalComponents.HospitalActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SchoolComponents.StudentsComponents.StudentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SchoolComponents.StudentsComponents.StudentsRegistration"
+            android:exported="false" />
+        <activity
+            android:name=".SchoolComponents.ChooseAction"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true" />
         <activity
             android:name=".SignUpActivity"
             android:exported="true" />
         <activity
-            android:name=".activity_register_school"
+            android:name=".SchoolComponents.activity_register_school"
             android:label="Add School"
             android:parentActivityName=".MainActivity"
             tools:ignore="DuplicateActivity" />

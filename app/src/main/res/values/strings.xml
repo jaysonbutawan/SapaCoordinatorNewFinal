@@ -30,4 +30,10 @@
     <string name="register_new_school">Register new school</string>
     <string name="school_name">School Name</string>
     <string name="address">Address</string>
+    <string name="no_approved_schools">No approved schools</string>
+    <string name="no_schools">No schools</string>
+    <string name="add_student">Add Student</string>
+    <string name="_63_9123456789">63+ 9123456789</string>
+    <string name="juandelacruz_example_com">juandelacruz@example.com</string>
+    <string name="select_an_available_time_slots">Select an available time slots</string>
 </resources>

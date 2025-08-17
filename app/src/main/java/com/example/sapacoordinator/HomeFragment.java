@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.sapacoordinator.SchoolComponents.activity_register_school;
+
 public class HomeFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
@@ -48,13 +50,20 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        CardView cardAddStudent = view.findViewById(R.id.add_school);
-        cardAddStudent.setOnClickListener(v -> {
+        CardView cardAddSchool = view.findViewById(R.id.add_school);
+        cardAddSchool.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), activity_register_school.class);
             startActivity(intent);
         });
 
         return view;
     }
-
+//        CardView cardAddStudent = view.findViewById(R.id.btnAddStudent);
+//        cardAddStudent.setOnClickListener(v -> {
+//            Intent intent = new Intent(getActivity(), activity_register_school.class);
+//            startActivity(intent);
+//        });
+//
+//        return view;
+//    }
 }

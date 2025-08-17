@@ -2,6 +2,8 @@ package com.example.sapacoordinator;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -10,7 +12,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -18,6 +19,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.sapacoordinator.Connector.ApiClient;
+import com.example.sapacoordinator.Connector.ApiInterface;
+import com.example.sapacoordinator.Connector.GenericResponse;
+import com.example.sapacoordinator.Connector.ServerDetector;
 
 public class
 SignUpActivity extends AppCompatActivity {
@@ -52,14 +58,41 @@ SignUpActivity extends AppCompatActivity {
         });
 
     }
-
-
     private void register() {
-        String firstname = firstnameInput.getText().toString();
-        String lastname = lastnameInput.getText().toString();
-        String email = emailInput.getText().toString();
-        String password = passwordInput.getText().toString();
+        String firstname = firstnameInput.getText().toString().trim();
+        String lastname = lastnameInput.getText().toString().trim();
+        String email = emailInput.getText().toString().trim();
+        String password = passwordInput.getText().toString().trim();
 
+        if (firstname.isEmpty() || lastname.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("Missing Fields")
+                    .setContentText("Please fill in all fields.")
+                    .show();
+            return;
+        }
+
+        // Detect server first
+        ServerDetector.detectServer(SignUpActivity.this, new ServerDetector.OnServerFoundListener() {
+            @Override
+            public void onServerFound(String baseUrl) {
+                ApiClient.setBaseUrl(baseUrl);
+                sendRegisterRequest(firstname, lastname, email, password);
+            }
+
+            @Override
+            public void onServerNotFound() {
+                showError("Server not found. Check your connection.");
+            }
+
+            @Override
+            public void onDetectionError(Exception e) {
+                showError("Error detecting server: " + e.getMessage());
+            }
+        });
+    }
+
+    private void sendRegisterRequest(String firstname, String lastname, String email, String password) {
         ApiInterface api = ApiClient.getClient().create(ApiInterface.class);
         Call<GenericResponse> call = api.registerUser(firstname, lastname, email, password);
 
@@ -67,29 +100,48 @@ SignUpActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    GenericResponse res = response.body();
-                    Toast.makeText(SignUpActivity.this, res.getMessage(), Toast.LENGTH_SHORT).show();
-
-                    if (res.isSuccess() ||
-                            (res.getMessage() != null && res.getMessage().toLowerCase().contains("already have an account"))) {
-
-                        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-
+                    handleRegisterResponse(response.body());
                 } else {
-                    Toast.makeText(SignUpActivity.this, "Server Error: " + response.code(), Toast.LENGTH_SHORT).show();
+                    showError("Server error: " + response.code());
                 }
                 resetFields();
             }
 
             @Override
             public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
-                Toast.makeText(SignUpActivity.this, "Connection Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                showError("Connection Error: " + t.getMessage());
             }
         });
     }
+
+
+    private void handleRegisterResponse(GenericResponse res) {
+        if (res.isSuccess()) {
+            new SweetAlertDialog(SignUpActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                    .setTitleText("Registration Successful!")
+                    .setContentText(res.getMessage())
+                    .setConfirmClickListener(sDialog -> {
+                        sDialog.dismissWithAnimation();
+                        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    })
+                    .show();
+        } else {
+            new SweetAlertDialog(SignUpActivity.this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Registration Failed")
+                    .setContentText(res.getMessage())
+                    .show();
+        }
+    }
+
+    private void showError(String message) {
+        new SweetAlertDialog(SignUpActivity.this, SweetAlertDialog.ERROR_TYPE)
+                .setTitleText("Connection Error")
+                .setContentText(message)
+                .show();
+    }
+
 
     @SuppressLint("SetTextI18n")
     private void resetFields() {
@@ -98,6 +150,7 @@ SignUpActivity extends AppCompatActivity {
         emailInput.setText("");
         passwordInput.setText("");
     }
+
 
 }
 
