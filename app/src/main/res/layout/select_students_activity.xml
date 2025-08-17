@@ -1,10 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/select_student"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HospitalComponents.TimeSlotsComponents.SelectStudentActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Training Slots"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Available positions"
+            android:textSize="14sp"
+            android:textColor="@color/gray_600"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <!-- Slot Availability -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1/10"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Selected"
+            android:textSize="14sp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/logo"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"/>
+    </LinearLayout>
+
+    <!-- Remaining Slots -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="9 slots remaining"
+        android:textSize="14sp"
+        android:textColor="@color/gray_600"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Selected Students Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selected Students (1)"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Selected Student Card -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="aaaaaa aaaaaaaaaa"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="9th Grade"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_600"/>
+            </LinearLayout>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remove"
+                android:layout_gravity="end"
+                android:layout_marginTop="8dp"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:textColor="@color/Blue"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Available Students Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Available Students"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tap to select • Drag to training area"
+        android:textSize="12sp"
+        android:textColor="@color/gray_600"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Available Students List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAvailableStudent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"/>
+
+    <!-- Selection Summary -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1 Student Selected"
+        android:textSize="14sp"
+        android:textColor="@color/gray_600"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Training Info -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/gray"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Training Program: General Medicine"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date &amp; Time: Friday, Aug 22 - 2:00 PM - 3:00 PM"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Location: City General Hospital"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <!-- Continue Button -->
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Continue to Final Booking"
+        style="@style/Widget.MaterialComponents.Button"
+        app:cornerRadius="8dp"/>
+</LinearLayout>
