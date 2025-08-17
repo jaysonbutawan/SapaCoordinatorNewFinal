@@ -29,7 +29,7 @@ public class HospitalActivity extends AppCompatActivity {
         int schoolId = getIntent().getIntExtra("school_id", -1);
 
         if (savedInstanceState == null) {
-            HospitalList hospitalListFragment = HospitalList.newInstance();
+            HospitalList hospitalListFragment = HospitalList.newInstance(schoolId);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.emptyState, hospitalListFragment);

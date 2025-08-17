@@ -87,10 +87,20 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
     }
 
     private boolean isBookingDataValid() {
-        return departmentId != -1 &&
-               schoolId != -1 &&
-               selectedDateSlotId != -1 &&
-               selectedTimeSlotId != -1;
+        // Add debug logging to see what values we have
+        Log.d("BookingValidation", "Checking booking data:");
+        Log.d("BookingValidation", "departmentId: " + departmentId);
+        Log.d("BookingValidation", "schoolId: " + schoolId);
+        Log.d("BookingValidation", "selectedDateSlotId: " + selectedDateSlotId);
+        Log.d("BookingValidation", "selectedTimeSlotId: " + selectedTimeSlotId);
+
+        boolean isValid = departmentId != -1 &&
+                schoolId != -1 &&
+                selectedDateSlotId != -1 &&
+                selectedTimeSlotId != -1;
+
+        Log.d("BookingValidation", "Is valid: " + isValid);
+        return isValid;
     }
 
     private void updateBookButtonState() {
@@ -101,13 +111,13 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
         Intent intent = new Intent(this, SelectStudentActivity.class);
         intent.putExtra("school_id", schoolId);
         intent.putExtra("department_id", departmentId);
-        intent.putExtra("date_slot_id", selectedDateSlotId);
+        intent.putExtra("date_slot_id", selectedDateSlotId);  // Fixed: using "date_slot_id"
         intent.putExtra("time_slot_id", selectedTimeSlotId);
 
         Log.d("BookingData", "Proceeding with: school_id=" + schoolId +
-              ", department_id=" + departmentId +
-              ", date_slot_id=" + selectedDateSlotId +
-              ", time_slot_id=" + selectedTimeSlotId);
+                ", department_id=" + departmentId +
+                ", date_slot_id=" + selectedDateSlotId +
+                ", time_slot_id=" + selectedTimeSlotId);
 
         startActivity(intent);
     }

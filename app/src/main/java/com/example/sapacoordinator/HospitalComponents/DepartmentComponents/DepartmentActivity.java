@@ -29,28 +29,30 @@ public class DepartmentActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         TextView tvHospitalName = findViewById(R.id.tvHospitalName);
         String hospitalName = getIntent().getStringExtra("hospital_name");
         int hospitalId = getIntent().getIntExtra("hospital_id", -1);
+        int schoolId = getIntent().getIntExtra("school_id", -1); // ✅ Get school_id
+
         Log.d("DepartmentActivity", "Hospital Name: " + hospitalName);
         Log.d("DepartmentActivity", "Hospital ID: " + hospitalId);
-
+        Log.d("DepartmentActivity", "School ID: " + schoolId); // ✅ Log school_id
 
         if (tvHospitalName != null && hospitalName != null) {
             tvHospitalName.setText(hospitalName);
-        }else{
+        } else {
             assert tvHospitalName != null;
             tvHospitalName.setText("Hospital Name Not Available");
         }
 
-
         if (savedInstanceState == null) {
-            DepartmentList departmentList = DepartmentList.newInstance(hospitalId);
+            // ✅ Pass both hospitalId and schoolId to DepartmentList
+            DepartmentList departmentList = DepartmentList.newInstance(hospitalId, schoolId);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.emptyState, departmentList);
             transaction.commit();
-
         }
     }
 }

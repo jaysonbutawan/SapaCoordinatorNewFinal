@@ -20,10 +20,13 @@ import java.util.List;
 public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.ViewHolder> {
     private final List<Hospital> hospitals;
     private final Context context;
+    private final int schoolId; // ✅ Add school_id field
+
     @SuppressLint("NotifyDataSetChanged")
-    public HospitalAdapter(List<Hospital> hospitals, Context context) {
+    public HospitalAdapter(List<Hospital> hospitals, Context context, int schoolId) {
         this.hospitals = hospitals;
         this.context = context;
+        this.schoolId = schoolId; // ✅ Store school_id
         notifyDataSetChanged();
     }
 
@@ -45,11 +48,12 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.ViewHo
         holder.tvDescription.setText(hospital.getDescriptions());
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DepartmentActivity.class);
-            intent.putExtra("hospital_id", hospital.getHospitalId()); // assuming your model has getId()
+            intent.putExtra("hospital_id", hospital.getHospitalId());
             intent.putExtra("hospital_name", hospital.getHospitalName());
-            Log.d("API_STATUS", "✅ Im going todepartment activity with hospital ID: " + hospital.getHospitalId());
+            intent.putExtra("school_id", schoolId); // ✅ Pass school_id to next activity
+            Log.d("API_STATUS", "✅ Im going to department activity with hospital ID: " + hospital.getHospitalId());
             Log.d("API_STATUS", "✅ Im going to department activity with hospital name: " + hospital.getHospitalName());
-            // Pass other necessary data if needed
+            Log.d("API_STATUS", "✅ Passing school_id: " + schoolId); // ✅ Log school_id
             context.startActivity(intent);
         });
     }

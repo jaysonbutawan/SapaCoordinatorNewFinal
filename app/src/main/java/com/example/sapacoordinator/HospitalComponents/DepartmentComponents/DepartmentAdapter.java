@@ -21,11 +21,13 @@ public class DepartmentAdapter extends RecyclerView.Adapter<DepartmentAdapter.Vi
 
     private final List<Department> departmentList;
     private final Context context;
+    private final int schoolId; // ✅ Add school_id field
 
     @SuppressLint("NotifyDataSetChanged")
-    public DepartmentAdapter(List<Department> departmentList, Context context) {
+    public DepartmentAdapter(List<Department> departmentList, Context context, int schoolId) {
         this.departmentList = departmentList;
         this.context = context;
+        this.schoolId = schoolId; // ✅ Store school_id
         notifyDataSetChanged();
     }
 
@@ -46,13 +48,16 @@ public class DepartmentAdapter extends RecyclerView.Adapter<DepartmentAdapter.Vi
         holder.tvHospitalName.setText(department.getHospital_name());
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DateTimeSlotSelectionActivity.class);
-            intent.putExtra("hospital_id",department.getDepartment_id()); // assuming your model has getId()
+            intent.putExtra("hospital_id", department.getDepartment_id());
             intent.putExtra("hospital_name", department.getHospital_name());
             intent.putExtra("department_id", department.getDepartment_id());
-            Log.d("API_STATUS", "✅ Im DateTimeSlotSelectionActivity with hospital ID: ");
-            Log.d("API_STATUS", "✅ Im going toDateTimeSlotSelectionActivity with hospital name: ");
+            intent.putExtra("school_id", schoolId); // ✅ Pass school_id to DateTimeSlotSelectionActivity
+
+            Log.d("API_STATUS", "✅ Going to DateTimeSlotSelectionActivity");
+            Log.d("API_STATUS", "✅ Hospital name: " + department.getHospital_name());
             Log.d("API_STATUS", "✅ Department ID: " + department.getDepartment_id());
-            // Pass other necessary data if needed
+            Log.d("API_STATUS", "✅ School ID: " + schoolId); // ✅ Log school_id
+
             context.startActivity(intent);
         });
     }

@@ -35,13 +35,16 @@ public class DepartmentList extends Fragment {
     private DepartmentAdapter adapter;
     private final List<Department> departmentList = new ArrayList<>();
     private int hospitalId; // from arguments
+    private int schoolId; // ✅ Add school_id field
 
     public DepartmentList() {}
 
-    public static DepartmentList newInstance(int hospitalId) {
+    // ✅ Updated factory method to accept both hospitalId and schoolId
+    public static DepartmentList newInstance(int hospitalId, int schoolId) {
         DepartmentList fragment = new DepartmentList();
         Bundle args = new Bundle();
         args.putInt("hospital_id", hospitalId);
+        args.putInt("school_id", schoolId); // ✅ Add school_id to arguments
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,11 +59,13 @@ public class DepartmentList extends Fragment {
         tvEmptyMessage = view.findViewById(R.id.tvEmptyMessage);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new DepartmentAdapter(departmentList, requireContext());
+        // ✅ Pass school_id to adapter
+        adapter = new DepartmentAdapter(departmentList, requireContext(), schoolId);
         recyclerView.setAdapter(adapter);
 
         if (getArguments() != null) {
             hospitalId = getArguments().getInt("hospital_id", -1);
+            schoolId = getArguments().getInt("school_id", -1); // ✅ Get school_id from arguments
         }
 
         if (hospitalId != -1) {

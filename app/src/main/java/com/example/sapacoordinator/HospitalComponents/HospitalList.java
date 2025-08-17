@@ -34,13 +34,19 @@ public class HospitalList extends Fragment {
     private TextView tvEmptyMessage;
     private HospitalAdapter adapter;
     private final List<Hospital> hospitalList = new ArrayList<>();
+    private int schoolId; // ✅ Add school_id field
 
     public HospitalList() {
 
     }
 
-    public static HospitalList newInstance() {
-        return new HospitalList();
+    // ✅ Updated factory method to accept school_id
+    public static HospitalList newInstance(int schoolId) {
+        HospitalList fragment = new HospitalList();
+        Bundle args = new Bundle();
+        args.putInt("school_id", schoolId);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @SuppressLint("MissingInflatedId")
@@ -49,11 +55,17 @@ public class HospitalList extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_hospital_list, container, false);
 
+        // ✅ Get school_id from arguments
+        if (getArguments() != null) {
+            schoolId = getArguments().getInt("school_id", -1);
+        }
+
         recyclerView = view.findViewById(R.id.rvHospitals);
         tvEmptyMessage = view.findViewById(R.id.tvEmptyMessage);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new HospitalAdapter(hospitalList, requireContext());
+        // ✅ Pass school_id to adapter
+        adapter = new HospitalAdapter(hospitalList, requireContext(), schoolId);
         recyclerView.setAdapter(adapter);
 
         loadHospitals();
