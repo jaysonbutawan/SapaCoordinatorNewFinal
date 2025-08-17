@@ -59,19 +59,21 @@ public class DepartmentList extends Fragment {
         tvEmptyMessage = view.findViewById(R.id.tvEmptyMessage);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        // ✅ Pass school_id to adapter
-        adapter = new DepartmentAdapter(departmentList, requireContext(), schoolId);
-        recyclerView.setAdapter(adapter);
 
+        // ✅ FIXED: Get arguments FIRST, then create adapter
         if (getArguments() != null) {
             hospitalId = getArguments().getInt("hospital_id", -1);
-            schoolId = getArguments().getInt("school_id", -1); // ✅ Get school_id from arguments
+            schoolId = getArguments().getInt("school_id", -1);
 
             // ✅ Add debug logging to track school_id in DepartmentList
             Log.d("DEBUG_", "DepartmentList received:");
             Log.d("DEBUG_", "  hospitalId: " + hospitalId);
             Log.d("DEBUG_", "  schoolId: " + schoolId);
         }
+
+        // ✅ FIXED: Create adapter AFTER getting schoolId from arguments
+        adapter = new DepartmentAdapter(departmentList, requireContext(), schoolId);
+        recyclerView.setAdapter(adapter);
 
         if (hospitalId != -1) {
             loadDepartments(hospitalId);
