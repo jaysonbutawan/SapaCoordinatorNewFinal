@@ -14,6 +14,8 @@ import com.example.sapacoordinator.R;
 
 public class StudentActivity extends AppCompatActivity {
 
+    private StudentList studentListFragment;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +33,20 @@ public class StudentActivity extends AppCompatActivity {
         int schoolId = getIntent().getIntExtra("school_id", -1);
 
         if (savedInstanceState == null) {
-            StudentList studentListFragment = StudentList.newInstance(schoolId);
+            studentListFragment = StudentList.newInstance(schoolId);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.emptyState, studentListFragment);
             transaction.commit();
         }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // ✅ Refresh the student list when returning to this activity
+        if (studentListFragment != null) {
+            studentListFragment.refreshStudents();
+        }
     }
 }

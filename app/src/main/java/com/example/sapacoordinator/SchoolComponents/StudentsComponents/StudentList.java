@@ -69,6 +69,11 @@ public class StudentList extends Fragment {
 
         return view;
     }
+
+    public void refreshStudents() {
+        loadStudents();
+    }
+
     @SuppressLint("SetTextI18n")
     private void loadStudents() {
         SharedPreferences prefs = requireContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
@@ -81,6 +86,8 @@ public class StudentList extends Fragment {
             return;
         }
 
+        Log.d("StudentList", "Loading students for school_id: " + schoolId + ", user_id: " + userId);
+
         ApiInterface api = ApiClient.getClient().create(ApiInterface.class);
         Call<List<Student>> call = api.getStudents(userId, schoolId);
 
@@ -92,6 +99,8 @@ public class StudentList extends Fragment {
                     studentList.clear();
                     studentList.addAll(response.body());
                     adapter.notifyDataSetChanged();
+
+                    Log.d("StudentList", "Students loaded successfully: " + studentList.size() + " students");
                     Log.d("API_RESPONSE", new Gson().toJson(response.body()));
 
                     if (studentList.isEmpty()) {
@@ -102,13 +111,18 @@ public class StudentList extends Fragment {
                         tvEmptyMessage.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
+                } else {
+                    Log.e("StudentList", "Failed to load students: " + response.code() + " - " + response.message());
+                    tvEmptyMessage.setText("Failed to load students");
+                    tvEmptyMessage.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Student>> call, @NonNull Throwable t) {
+                Log.e("StudentList", "Error loading students", t);
                 tvEmptyMessage.setText("Failed to load students");
-                Log.e("API_ERROR", "Load failed", t);
                 tvEmptyMessage.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
             }
