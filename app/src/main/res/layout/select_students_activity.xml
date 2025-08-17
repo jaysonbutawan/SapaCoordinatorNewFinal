@@ -6,7 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".HospitalComponents.TimeSlotsComponents.SelectStudentActivity">
+
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +26,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Available positions"
+            android:text="Select students for booking"
             android:textSize="14sp"
             android:textColor="@color/gray_600"
             android:layout_marginTop="4dp"/>
@@ -38,9 +41,10 @@
         android:gravity="center_vertical">
 
         <TextView
+            android:id="@+id/tvSlotCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1/10"
+            android:text="0/10"
             android:textSize="18sp"
             android:textStyle="bold"/>
 
@@ -57,66 +61,23 @@
 
     <!-- Remaining Slots -->
     <TextView
+        android:id="@+id/tvRemainingSlots"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="9 slots remaining"
+        android:text="10 slots remaining"
         android:textSize="14sp"
         android:textColor="@color/gray_600"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Selected Students Section -->
+    <!-- Selected Students Section Header -->
     <TextView
+        android:id="@+id/tvSelectedStudentsCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Selected Students (1)"
+        android:text="Selected Students (0)"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp"/>
-
-    <!-- Selected Student Card -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="aaaaaa aaaaaaaaaa"
-                    android:textSize="16sp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="9th Grade"
-                    android:textSize="14sp"
-                    android:textColor="@color/gray_600"/>
-            </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Remove"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:textColor="@color/Blue"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
     <!-- Available Students Section -->
     <TextView
@@ -125,12 +86,13 @@
         android:text="Available Students"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="16dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tap to select • Drag to training area"
+        android:text="Tap to select students for the training session"
         android:textSize="12sp"
         android:textColor="@color/gray_600"
         android:layout_marginBottom="8dp"/>
@@ -145,49 +107,24 @@
 
     <!-- Selection Summary -->
     <TextView
+        android:id="@+id/tvSelectionSummary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="1 Student Selected"
+        android:text="No students selected"
         android:textSize="14sp"
         android:textColor="@color/gray_600"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Training Info -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/gray"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Training Program: General Medicine"
-            android:textSize="14sp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Date &amp; Time: Friday, Aug 22 - 2:00 PM - 3:00 PM"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Location: City General Hospital"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
-    </LinearLayout>
+        android:layout_marginBottom="16dp"
+        android:gravity="center"/>
 
     <!-- Continue Button -->
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnContinueBooking"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Continue to Final Booking"
+        android:enabled="false"
         style="@style/Widget.MaterialComponents.Button"
         app:cornerRadius="8dp"/>
+
 </LinearLayout>

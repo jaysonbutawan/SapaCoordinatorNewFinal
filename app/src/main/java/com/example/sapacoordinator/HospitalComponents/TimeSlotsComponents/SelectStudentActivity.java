@@ -1,31 +1,55 @@
 package com.example.sapacoordinator.HospitalComponents.TimeSlotsComponents;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.sapacoordinator.Connector.ApiClient;
+import com.example.sapacoordinator.Connector.ApiInterface;
 import com.example.sapacoordinator.R;
+import com.example.sapacoordinator.SchoolComponents.StudentsComponents.Student;
+import com.google.gson.Gson;
 
-public class SelectStudentActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class SelectStudentActivity extends AppCompatActivity implements BookingStudentAdapter.OnStudentSelectionListener {
 
     private int schoolId;
     private int departmentId;
     private int dateSlotId;
     private int timeSlotId;
 
-    private TextView tvTrainingInfo;
     private TextView tvSlotCount;
     private TextView tvRemainingSlots;
     private TextView tvSelectedStudentsCount;
+    private TextView tvSelectionSummary;
     private RecyclerView rvAvailableStudent;
+    private Button btnContinueBooking;
+
+    private BookingStudentAdapter adapter;
+    private List<Student> studentList = new ArrayList<>();
+    private int maxCapacity = 10; // Default capacity
+    private int selectedCount = 0;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -58,24 +82,44 @@ public class SelectStudentActivity extends AppCompatActivity {
         // Validate booking data
         if (!isBookingDataValid()) {
             Log.e("DEBUG_", "Invalid booking data received");
-            finish(); // Close activity if data is invalid
+            finish();
             return;
         }
 
-        // Load students and time slot capacity
+        // Initialize RecyclerView
+        setupRecyclerView();
+
+        // Load data
         loadTimeSlotCapacity();
         loadAvailableStudents();
     }
 
     private void initializeViews() {
-        // Initialize TextViews (you may need to adjust IDs based on your actual layout)
         rvAvailableStudent = findViewById(R.id.rvAvailableStudent);
+        btnContinueBooking = findViewById(R.id.btnContinueBooking);
 
-        // If you have these TextViews in your layout, uncomment and adjust IDs:
-        // tvTrainingInfo = findViewById(R.id.tvTrainingInfo);
-        // tvSlotCount = findViewById(R.id.tvSlotCount);
-        // tvRemainingSlots = findViewById(R.id.tvRemainingSlots);
-        // tvSelectedStudentsCount = findViewById(R.id.tvSelectedStudentsCount);
+        // Initialize TextViews with actual IDs from your layout
+        tvSlotCount = findViewById(R.id.tvSlotCount);
+        tvRemainingSlots = findViewById(R.id.tvRemainingSlots);
+        tvSelectedStudentsCount = findViewById(R.id.tvSelectedStudentsCount);
+        tvSelectionSummary = findViewById(R.id.tvSelectionSummary);
+
+        // Handle continue button click
+        btnContinueBooking.setOnClickListener(v -> {
+            if (selectedCount > 0) {
+                proceedToFinalBooking();
+            } else {
+                Toast.makeText(this, "Please select at least one student", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        updateUI();
+    }
+
+    private void setupRecyclerView() {
+        adapter = new BookingStudentAdapter(this, studentList, this);
+        rvAvailableStudent.setLayoutManager(new LinearLayoutManager(this));
+        rvAvailableStudent.setAdapter(adapter);
     }
 
     private boolean isBookingDataValid() {
@@ -83,18 +127,120 @@ public class SelectStudentActivity extends AppCompatActivity {
     }
 
     private void loadTimeSlotCapacity() {
-        // TODO: Implement API call to get time slot capacity
-        // This will help determine how many students can be selected
+        // TODO: Replace with actual API call to get time slot capacity
+        // For now, using default capacity
         Log.d("DEBUG_", "Loading time slot capacity for time slot ID: " + timeSlotId);
+        maxCapacity = 10; // This should come from API
+        adapter.setMaxSelections(maxCapacity);
+        updateUI();
     }
 
     private void loadAvailableStudents() {
-        // TODO: Implement API call to load available students for the school
         Log.d("DEBUG_", "Loading available students for school ID: " + schoolId);
+
+        SharedPreferences prefs = getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+        int userId = prefs.getInt("user_id", -1);
+
+        if (userId == -1) {
+            Toast.makeText(this, "User session expired. Please log in again.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        ApiInterface api = ApiClient.getClient().create(ApiInterface.class);
+        Call<List<Student>> call = api.getStudents(userId, schoolId);
+
+        call.enqueue(new Callback<List<Student>>() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onResponse(@NonNull Call<List<Student>> call, @NonNull Response<List<Student>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    studentList.clear();
+                    studentList.addAll(response.body());
+                    adapter.notifyDataSetChanged();
+
+                    Log.d("DEBUG_", "Students loaded: " + studentList.size());
+                    Log.d("API_RESPONSE", new Gson().toJson(response.body()));
+
+                    updateUI();
+                } else {
+                    Log.e("DEBUG_", "Failed to load students: " + response.code());
+                    Toast.makeText(SelectStudentActivity.this, "Failed to load students", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Student>> call, @NonNull Throwable t) {
+                Log.e("DEBUG_", "Error loading students", t);
+                Toast.makeText(SelectStudentActivity.this, "Error loading students", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    // TODO: Add methods for:
-    // - Student selection/deselection
-    // - Final booking submission
-    // - UI updates for selected students count
+    @Override
+    public void onStudentSelected(Student student, boolean isSelected) {
+        selectedCount = adapter.getSelectedCount();
+        Log.d("DEBUG_", "Student " + student.getFirstname() + " " +
+              (isSelected ? "selected" : "deselected") + ". Total selected: " + selectedCount);
+        updateUI();
+    }
+
+    @Override
+    public void onSelectionLimitReached(int maxLimit) {
+        Toast.makeText(this, "Maximum " + maxLimit + " students can be selected", Toast.LENGTH_LONG).show();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void updateUI() {
+        // Update slot count display
+        if (tvSlotCount != null) {
+            tvSlotCount.setText(selectedCount + "/" + maxCapacity);
+        }
+
+        // Update remaining slots
+        int remaining = maxCapacity - selectedCount;
+        if (tvRemainingSlots != null) {
+            tvRemainingSlots.setText(remaining + " slots remaining");
+        }
+
+        // Update selected students count
+        if (tvSelectedStudentsCount != null) {
+            tvSelectedStudentsCount.setText("Selected Students (" + selectedCount + ")");
+        }
+
+        // Update selection summary
+        if (tvSelectionSummary != null) {
+            if (selectedCount == 0) {
+                tvSelectionSummary.setText("No students selected");
+            } else if (selectedCount == 1) {
+                tvSelectionSummary.setText("1 Student Selected");
+            } else {
+                tvSelectionSummary.setText(selectedCount + " Students Selected");
+            }
+        }
+
+        // Update continue button state
+        if (btnContinueBooking != null) {
+            btnContinueBooking.setEnabled(selectedCount > 0);
+        }
+    }
+
+    private void proceedToFinalBooking() {
+        Set<Integer> selectedStudentIds = adapter.getSelectedStudentIds();
+
+        Log.d("DEBUG_", "Proceeding to final booking with:");
+        Log.d("DEBUG_", "Selected students: " + selectedStudentIds.size());
+        Log.d("DEBUG_", "Student IDs: " + selectedStudentIds.toString());
+
+        // TODO: Implement final booking submission
+        // You can create a new activity or show a confirmation dialog
+
+        Toast.makeText(this, "Booking " + selectedCount + " students...", Toast.LENGTH_LONG).show();
+
+        // For now, just show success message
+        // In a real implementation, you would:
+        // 1. Submit booking to backend API
+        // 2. Navigate to confirmation screen
+        // 3. Handle success/error responses
+    }
 }
