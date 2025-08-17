@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -62,6 +63,10 @@ public class SchoolList extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         adapter = new SchoolsAdapter(requireContext(), schoolList, selectedSchool -> {
+            // ✅ Add debug logging to track school_id being passed
+            Log.d("DEBUG_", "Selected school_id: " + selectedSchool.getId());
+            Log.d("DEBUG_", "Selected school_name: " + selectedSchool.getName());
+
             Intent intent = new Intent(getContext(), ChooseAction.class);
             intent.putExtra("school_id", selectedSchool.getId());
             intent.putExtra("school_name", selectedSchool.getName());
@@ -98,6 +103,18 @@ public class SchoolList extends Fragment {
             @Override
             public void onResponse(@NonNull Call<List<School>> call, @NonNull Response<List<School>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    // ✅ Add detailed logging of API response
+                    Log.d("DEBUG_", "API Response successful, schools count: " + response.body().size());
+
+                    // ✅ Log each school's details including ID
+                    for (int i = 0; i < response.body().size(); i++) {
+                        School school = response.body().get(i);
+                        Log.d("DEBUG_", "School " + i + ":");
+                        Log.d("DEBUG_", "  ID: " + school.getId());
+                        Log.d("DEBUG_", "  Name: " + school.getName());
+                        Log.d("DEBUG_", "  Status: " + school.getStatus());
+                    }
+
                     schoolList.clear();
                     schoolList.addAll(response.body());
                     adapter.notifyDataSetChanged();
@@ -110,6 +127,8 @@ public class SchoolList extends Fragment {
                         tvEmptyMessage.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
+                } else {
+                    Log.e("DEBUG_", "API Response failed: " + response.code() + " - " + response.message());
                 }
             }
 

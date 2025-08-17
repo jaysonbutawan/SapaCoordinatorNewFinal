@@ -28,6 +28,10 @@ public class DepartmentAdapter extends RecyclerView.Adapter<DepartmentAdapter.Vi
         this.departmentList = departmentList;
         this.context = context;
         this.schoolId = schoolId; // ✅ Store school_id
+
+        // ✅ Add debug logging to track school_id in adapter constructor
+        Log.d("DEBUG_", "DepartmentAdapter created with school_id: " + schoolId);
+
         notifyDataSetChanged();
     }
 
@@ -53,10 +57,10 @@ public class DepartmentAdapter extends RecyclerView.Adapter<DepartmentAdapter.Vi
             intent.putExtra("department_id", department.getDepartment_id());
             intent.putExtra("school_id", schoolId); // ✅ Pass school_id to DateTimeSlotSelectionActivity
 
-            Log.d("API_STATUS", "✅ Going to DateTimeSlotSelectionActivity");
-            Log.d("API_STATUS", "✅ Hospital name: " + department.getHospital_name());
-            Log.d("API_STATUS", "✅ Department ID: " + department.getDepartment_id());
-            Log.d("API_STATUS", "✅ School ID: " + schoolId); // ✅ Log school_id
+            Log.d("DEBUG_", "✅ Going to DateTimeSlotSelectionActivity");
+            Log.d("DEBUG_", "✅ Hospital name: " + department.getHospital_name());
+            Log.d("DEBUG_", "✅ Department ID: " + department.getDepartment_id());
+            Log.d("DEBUG_", "✅ School ID: " + schoolId+ " Select date and time"); // ✅ Log school_id
 
             context.startActivity(intent);
         });

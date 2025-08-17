@@ -46,18 +46,18 @@ public class SelectStudentActivity extends AppCompatActivity {
         timeSlotId = getIntent().getIntExtra("time_slot_id", -1);
 
         // Log the received data
-        Log.d("SelectStudent", "Received booking data:");
-        Log.d("SelectStudent", "School ID: " + schoolId);
-        Log.d("SelectStudent", "Department ID: " + departmentId);
-        Log.d("SelectStudent", "Date Slot ID: " + dateSlotId);
-        Log.d("SelectStudent", "Time Slot ID: " + timeSlotId);
+        Log.d("DEBUG_", "Received booking data:");
+        Log.d("DEBUG_", "School ID: " + schoolId);
+        Log.d("DEBUG_", "Department ID: " + departmentId);
+        Log.d("DEBUG_", "Date Slot ID: " + dateSlotId);
+        Log.d("DEBUG_", "Time Slot ID: " + timeSlotId);
 
         // Initialize views
         initializeViews();
 
         // Validate booking data
         if (!isBookingDataValid()) {
-            Log.e("SelectStudent", "Invalid booking data received");
+            Log.e("DEBUG_", "Invalid booking data received");
             finish(); // Close activity if data is invalid
             return;
         }
@@ -85,12 +85,12 @@ public class SelectStudentActivity extends AppCompatActivity {
     private void loadTimeSlotCapacity() {
         // TODO: Implement API call to get time slot capacity
         // This will help determine how many students can be selected
-        Log.d("SelectStudent", "Loading time slot capacity for time slot ID: " + timeSlotId);
+        Log.d("DEBUG_", "Loading time slot capacity for time slot ID: " + timeSlotId);
     }
 
     private void loadAvailableStudents() {
         // TODO: Implement API call to load available students for the school
-        Log.d("SelectStudent", "Loading available students for school ID: " + schoolId);
+        Log.d("DEBUG_", "Loading available students for school ID: " + schoolId);
     }
 
     // TODO: Add methods for:

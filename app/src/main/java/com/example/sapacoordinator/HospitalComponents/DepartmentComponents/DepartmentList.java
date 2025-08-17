@@ -66,6 +66,11 @@ public class DepartmentList extends Fragment {
         if (getArguments() != null) {
             hospitalId = getArguments().getInt("hospital_id", -1);
             schoolId = getArguments().getInt("school_id", -1); // ✅ Get school_id from arguments
+
+            // ✅ Add debug logging to track school_id in DepartmentList
+            Log.d("DEBUG_", "DepartmentList received:");
+            Log.d("DEBUG_", "  hospitalId: " + hospitalId);
+            Log.d("DEBUG_", "  schoolId: " + schoolId);
         }
 
         if (hospitalId != -1) {

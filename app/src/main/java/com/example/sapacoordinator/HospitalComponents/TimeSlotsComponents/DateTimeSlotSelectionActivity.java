@@ -37,9 +37,17 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
         departmentId = getIntent().getIntExtra("department_id", -1);
         schoolId = getIntent().getIntExtra("school_id", -1); // Get school_id from intent
 
+        // ✅ Log the received values immediately
+        Log.d("DEBUG_", "DateTimeSlotSelection onCreate:");
+        Log.d("DEBUG_", "  Received departmentId: " + departmentId);
+        Log.d("DEBUG_", "  Received schoolId: " + schoolId);
+
         // Initialize button
         btnBookAppointment = findViewById(R.id.btnBookAppointment);
         btnBookAppointment.setEnabled(false); // Disabled until both date and time are selected
+
+        // ✅ Update button state after getting intent data
+        updateBookButtonState();
 
         btnBookAppointment.setOnClickListener(v -> {
             if (isBookingDataValid()) {
@@ -60,7 +68,7 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
 
     @Override
     public void onDateSelected(int dateSlotId) {
-        Log.d("DateTimeSlotSelection", "Selected dateSlotId: " + dateSlotId);
+        Log.d("DEBUG_", "Selected dateSlotId: " + dateSlotId);
         selectedDateSlotId = dateSlotId;
         // Reset time slot selection when date changes
         selectedTimeSlotId = -1;
@@ -81,30 +89,43 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
 
     @Override
     public void onTimeSlotSelected(int timeSlotId) {
-        Log.d("DateTimeSlotSelection", "Selected timeSlotId: " + timeSlotId);
+        Log.d("DEBUG_", "Selected timeSlotId: " + timeSlotId);
         selectedTimeSlotId = timeSlotId;
         updateBookButtonState();
     }
 
     private boolean isBookingDataValid() {
         // Add debug logging to see what values we have
-        Log.d("BookingValidation", "Checking booking data:");
-        Log.d("BookingValidation", "departmentId: " + departmentId);
-        Log.d("BookingValidation", "schoolId: " + schoolId);
-        Log.d("BookingValidation", "selectedDateSlotId: " + selectedDateSlotId);
-        Log.d("BookingValidation", "selectedTimeSlotId: " + selectedTimeSlotId);
+        Log.d("DEBUG_", "Checking booking data:");
+        Log.d("DEBUG_", "departmentId: " + departmentId);
+        Log.d("DEBUG_", "schoolId: " + schoolId);
+        Log.d("DEBUG_", "selectedDateSlotId: " + selectedDateSlotId);
+        Log.d("DEBUG_", "selectedTimeSlotId: " + selectedTimeSlotId);
 
         boolean isValid = departmentId != -1 &&
                 schoolId != -1 &&
                 selectedDateSlotId != -1 &&
                 selectedTimeSlotId != -1;
 
-        Log.d("BookingValidation", "Is valid: " + isValid);
+        Log.d("DEBUG_", "Is valid: " + isValid);
         return isValid;
     }
 
     private void updateBookButtonState() {
-        btnBookAppointment.setEnabled(selectedDateSlotId != -1 && selectedTimeSlotId != -1);
+        // ✅ Include school_id in button state validation
+        boolean hasValidData = selectedDateSlotId != -1 &&
+                              selectedTimeSlotId != -1 &&
+                              schoolId != -1 &&
+                              departmentId != -1;
+
+        btnBookAppointment.setEnabled(hasValidData);
+
+        Log.d("DEBUG_", "Button state updated:");
+        Log.d("DEBUG_", "  hasValidData: " + hasValidData);
+        Log.d("DEBUG_", "  schoolId: " + schoolId);
+        Log.d("DEBUG_", "  departmentId: " + departmentId);
+        Log.d("DEBUG_", "  selectedDateSlotId: " + selectedDateSlotId);
+        Log.d("DEBUG_", "  selectedTimeSlotId: " + selectedTimeSlotId);
     }
 
     private void proceedToStudentSelection() {

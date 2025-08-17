@@ -35,9 +35,9 @@ public class DepartmentActivity extends AppCompatActivity {
         int hospitalId = getIntent().getIntExtra("hospital_id", -1);
         int schoolId = getIntent().getIntExtra("school_id", -1); // ✅ Get school_id
 
-        Log.d("DepartmentActivity", "Hospital Name: " + hospitalName);
-        Log.d("DepartmentActivity", "Hospital ID: " + hospitalId);
-        Log.d("DepartmentActivity", "School ID: " + schoolId); // ✅ Log school_id
+        Log.d("DEBUG_", "Hospital Name: " + hospitalName);
+        Log.d("DEBUG_", "Hospital ID: " + hospitalId);
+        Log.d("DEBUG_", "School ID: " + schoolId + " is paasing to select time and date"); // ✅ Log school_id
 
         if (tvHospitalName != null && hospitalName != null) {
             tvHospitalName.setText(hospitalName);

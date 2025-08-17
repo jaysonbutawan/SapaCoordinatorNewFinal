@@ -51,9 +51,9 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.ViewHo
             intent.putExtra("hospital_id", hospital.getHospitalId());
             intent.putExtra("hospital_name", hospital.getHospitalName());
             intent.putExtra("school_id", schoolId); // ✅ Pass school_id to next activity
-            Log.d("API_STATUS", "✅ Im going to department activity with hospital ID: " + hospital.getHospitalId());
-            Log.d("API_STATUS", "✅ Im going to department activity with hospital name: " + hospital.getHospitalName());
-            Log.d("API_STATUS", "✅ Passing school_id: " + schoolId); // ✅ Log school_id
+            Log.d("DEBUG_", "✅ Im going to department activity with hospital ID: " + hospital.getHospitalId());
+            Log.d("DEBUG_", "✅ Im going to department activity with hospital name: " + hospital.getHospitalName());
+            Log.d("DEBUG_", "✅ Passing school_id: " + schoolId); // ✅ Log school_id
             context.startActivity(intent);
         });
     }

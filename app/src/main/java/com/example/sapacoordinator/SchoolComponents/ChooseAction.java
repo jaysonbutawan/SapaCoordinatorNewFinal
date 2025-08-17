@@ -59,6 +59,10 @@ public class ChooseAction extends AppCompatActivity {
         schoolContact = receivedIntent.getStringExtra("school_contact");
         schoolId = receivedIntent.getIntExtra("school_id", -1);
 
+        // ✅ Add debug logging to track school_id
+        Log.d("DEBUG_", "Received school_id: " + schoolId);
+        Log.d("DEBUG_", "Received school_name: " + schoolName);
+
         // Bind TextViews
         TextView tvSchoolName = findViewById(R.id.tvSchoolName);
         TextView tvAddress = findViewById(R.id.tvAddress);
@@ -78,6 +82,7 @@ public class ChooseAction extends AppCompatActivity {
             intent.putExtra("school_name", schoolName);
             intent.putExtra("school_address", schoolAddress);
             intent.putExtra("school_contact", schoolContact);
+            Log.d("DEBUG_", "Navigating to StudentsRegistration with school_id: " + schoolId);
             startActivity(intent);
         });
 
@@ -86,6 +91,7 @@ public class ChooseAction extends AppCompatActivity {
             Intent intent = new Intent(ChooseAction.this, HospitalActivity.class);
             intent.putExtra("school_id", schoolId);
             intent.putExtra("user_id", userId);
+            Log.d("DEBUG_", "Navigating to StudentsRegistration with school_id: " + schoolId);
             startActivity(intent);
         });
 
@@ -124,4 +130,3 @@ public class ChooseAction extends AppCompatActivity {
         });
     }
 }
-
