@@ -2,7 +2,6 @@ package com.example.sapacoordinator.Connector;
 
 import com.example.sapacoordinator.HospitalComponents.DepartmentComponents.Department;
 import com.example.sapacoordinator.HospitalComponents.Hospital;
-import com.example.sapacoordinator.HospitalComponents.TimeSlotsComponents.BookingResponse;
 import com.example.sapacoordinator.HospitalComponents.TimeSlotsComponents.DateSlot;
 import com.example.sapacoordinator.HospitalComponents.TimeSlotsComponents.TimeSlotItem;
 import com.example.sapacoordinator.SchoolComponents.School;
@@ -90,7 +89,7 @@ public interface ApiInterface {
 
     // ✅ Booking submission endpoint
 
-    
+
     @FormUrlEncoded
     @POST("book_appointment.php")
     Call<GenericResponse> bookAppointment(

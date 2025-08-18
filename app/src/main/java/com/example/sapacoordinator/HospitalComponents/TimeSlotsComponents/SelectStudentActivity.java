@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sapacoordinator.Connector.ApiClient;
 import com.example.sapacoordinator.Connector.ApiInterface;
+import com.example.sapacoordinator.Connector.GenericResponse;
 import com.example.sapacoordinator.R;
 import com.example.sapacoordinator.SchoolComponents.StudentsComponents.Student;
 import com.google.gson.Gson;
@@ -270,7 +271,7 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
                 currentStudentId
         );
 
-        call.enqueue(new Callback<GenericResponse>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
