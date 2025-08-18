@@ -278,6 +278,7 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
                     GenericResponse genericResponse = response.body();
 
                     if (genericResponse.isSuccess()) {
+                        Log.e("DEBUG_", "Code: " + response.code());
                         Log.d("DEBUG_", "Student " + currentStudentId + " booked successfully");
                         // Continue with the next student
                         submitBookingForStudents(studentIds, hospitalId);
