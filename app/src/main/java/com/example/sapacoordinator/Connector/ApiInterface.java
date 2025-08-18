@@ -2,6 +2,7 @@ package com.example.sapacoordinator.Connector;
 
 import com.example.sapacoordinator.HospitalComponents.DepartmentComponents.Department;
 import com.example.sapacoordinator.HospitalComponents.Hospital;
+import com.example.sapacoordinator.HospitalComponents.TimeSlotsComponents.BookingResponse;
 import com.example.sapacoordinator.HospitalComponents.TimeSlotsComponents.DateSlot;
 import com.example.sapacoordinator.HospitalComponents.TimeSlotsComponents.TimeSlotItem;
 import com.example.sapacoordinator.SchoolComponents.School;
@@ -10,10 +11,10 @@ import com.example.sapacoordinator.SchoolComponents.StudentsComponents.Student;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Field;
 import retrofit2.http.Query;
 
 public interface ApiInterface {
@@ -87,8 +88,16 @@ public interface ApiInterface {
     @GET("get_time_slots.php")
     Call<List<TimeSlotItem>> getTimeSlots(@Query("date_slot_id") int dateSlotId);
 
+    // ✅ Booking submission endpoint
+
+    
+    @FormUrlEncoded
+    @POST("book_appointment.php")
+    Call<GenericResponse> bookAppointment(
+            @Field("school_id") int schoolId,
+            @Field("hospital_id") int hospitalId,
+            @Field("time_slot_id") int timeSlotId,
+            @Field("student_id") int studentId
+    );
+
 }
-
-
-
-

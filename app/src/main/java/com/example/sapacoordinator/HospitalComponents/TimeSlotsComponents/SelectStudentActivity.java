@@ -232,15 +232,98 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         Log.d("DEBUG_", "Selected students: " + selectedStudentIds.size());
         Log.d("DEBUG_", "Student IDs: " + selectedStudentIds.toString());
 
-        // TODO: Implement final booking submission
-        // You can create a new activity or show a confirmation dialog
+        // ✅ Show loading state
+        btnContinueBooking.setEnabled(false);
+        btnContinueBooking.setText("Submitting Booking...");
 
-        Toast.makeText(this, "Booking " + selectedCount + " students...", Toast.LENGTH_LONG).show();
+        // ✅ We need to get hospital_id from department data
+        // For now, we'll use department_id as hospital_id (you may need to adjust this based on your data structure)
+        int hospitalId = departmentId; // This might need to be adjusted based on your actual data relationship
 
-        // For now, just show success message
-        // In a real implementation, you would:
-        // 1. Submit booking to backend API
-        // 2. Navigate to confirmation screen
-        // 3. Handle success/error responses
+        Log.d("DEBUG_", "Submitting booking with:");
+        Log.d("DEBUG_", "  school_id: " + schoolId);
+        Log.d("DEBUG_", "  hospital_id: " + hospitalId);
+        Log.d("DEBUG_", "  time_slot_id: " + timeSlotId);
+        Log.d("DEBUG_", "  department_id: " + departmentId);
+        Log.d("DEBUG_", "  date_slot_id: " + dateSlotId);
+
+        // ✅ Submit booking to API - call BookAppointment procedure for each student
+        submitBookingForStudents(new ArrayList<>(selectedStudentIds), hospitalId);
+    }
+
+    private void submitBookingForStudents(List<Integer> studentIds, int hospitalId) {
+        if (studentIds.isEmpty()) {
+            // All students processed successfully
+            showBookingSuccessDialog();
+            return;
+        }
+
+        // Process one student at a time using the BookAppointment procedure
+        int currentStudentId = studentIds.get(0);
+        studentIds.remove(0); // Remove the current student from the list
+
+        ApiInterface api = ApiClient.getClient().create(ApiInterface.class);
+        Call<GenericResponse> call = api.bookAppointment(
+                schoolId,
+                hospitalId,
+                timeSlotId,
+                currentStudentId
+        );
+
+        call.enqueue(new Callback<GenericResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    GenericResponse genericResponse = response.body();
+
+                    if (genericResponse.isSuccess()) {
+                        Log.d("DEBUG_", "Student " + currentStudentId + " booked successfully");
+                        // Continue with the next student
+                        submitBookingForStudents(studentIds, hospitalId);
+                    } else {
+                        // Booking failed for this student
+                        handleBookingError("Booking failed for student ID " + currentStudentId + ": " + genericResponse.getMessage());
+                    }
+                } else {
+                    handleBookingError("API response failed: " + response.code() + " - " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+                handleBookingError("Network error: " + t.getMessage());
+            }
+        });
+    }
+
+    private void handleBookingError(String errorMessage) {
+        // Reset button state
+        btnContinueBooking.setText("Continue to Final Booking");
+        btnContinueBooking.setEnabled(true);
+
+        Log.e("DEBUG_", errorMessage);
+        Toast.makeText(SelectStudentActivity.this,
+                "Booking failed: " + errorMessage,
+                Toast.LENGTH_LONG).show();
+    }
+
+    // ✅ Show success dialog with booking details
+    private void showBookingSuccessDialog() {
+        // Reset button state
+        btnContinueBooking.setText("Continue to Final Booking");
+        btnContinueBooking.setEnabled(true);
+
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setTitle("Booking Successful! ✅")
+                .setMessage("Your appointments have been submitted successfully!\n\n" +
+                        "Students: " + selectedCount + " selected\n" +
+                        "Status: Pending\n\n" +
+                        "You will be notified when the hospital responds to your request.")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // ✅ Navigate back to main screen
+                    finish(); // This will close the SelectStudentActivity
+                })
+                .setCancelable(false)
+                .show();
     }
 }
