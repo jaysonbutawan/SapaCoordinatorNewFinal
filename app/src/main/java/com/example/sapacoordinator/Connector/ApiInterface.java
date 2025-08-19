@@ -96,7 +96,7 @@ public interface ApiInterface {
             @Field("school_id") int schoolId,
             @Field("hospital_id") int hospitalId,
             @Field("time_slot_id") int timeSlotId,
-            @Field("student_id") int studentId
+            @Field("student_ids[]") List<Integer> studentIds
     );
 
 }

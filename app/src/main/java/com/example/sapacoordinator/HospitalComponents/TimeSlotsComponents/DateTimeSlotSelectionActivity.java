@@ -21,6 +21,7 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
     private int schoolId = -1; // You'll need to pass this from previous activity
     private int selectedDateSlotId = -1;
     private int selectedTimeSlotId = -1;
+    private int selectedTimeSlotCapacity = 10; // Default capacity, will be updated when time slot is selected
     private Button btnBookAppointment;
 
     @Override
@@ -50,10 +51,26 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
         updateBookButtonState();
 
         btnBookAppointment.setOnClickListener(v -> {
+            // Check specific missing selections and provide detailed feedback
+            if (selectedDateSlotId == -1 && selectedTimeSlotId == -1) {
+                Toast.makeText(this, "Please select a date and time slot first", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (selectedDateSlotId == -1) {
+                Toast.makeText(this, "Please select a date first", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (selectedTimeSlotId == -1) {
+                Toast.makeText(this, "Please select a time slot first", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (isBookingDataValid()) {
                 proceedToStudentSelection();
             } else {
-                Toast.makeText(this, "Please select both date and time slot", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please ensure all booking information is complete", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -72,6 +89,7 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
         selectedDateSlotId = dateSlotId;
         // Reset time slot selection when date changes
         selectedTimeSlotId = -1;
+        selectedTimeSlotCapacity = 10; // Reset capacity when date changes
         updateBookButtonState();
 
         TimeSlotList existingFragment = (TimeSlotList) getSupportFragmentManager()
@@ -91,6 +109,14 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
     public void onTimeSlotSelected(int timeSlotId) {
         Log.d("DEBUG_", "Selected timeSlotId: " + timeSlotId);
         selectedTimeSlotId = timeSlotId;
+
+        // Get the selected time slot capacity from the TimeSlotList fragment
+        TimeSlotList timeSlotFragment = (TimeSlotList) getSupportFragmentManager().findFragmentById(R.id.timeSlotContainer);
+        if (timeSlotFragment != null) {
+            selectedTimeSlotCapacity = timeSlotFragment.getSelectedTimeSlotCapacity(timeSlotId);
+            Log.d("DEBUG_", "Selected time slot capacity: " + selectedTimeSlotCapacity);
+        }
+
         updateBookButtonState();
     }
 
@@ -132,13 +158,15 @@ public class DateTimeSlotSelectionActivity extends AppCompatActivity
         Intent intent = new Intent(this, SelectStudentActivity.class);
         intent.putExtra("school_id", schoolId);
         intent.putExtra("department_id", departmentId);
-        intent.putExtra("date_slot_id", selectedDateSlotId);  // Fixed: using "date_slot_id"
+        intent.putExtra("date_slot_id", selectedDateSlotId);  // Fixed: correct key name
         intent.putExtra("time_slot_id", selectedTimeSlotId);
+        intent.putExtra("time_slot_capacity", selectedTimeSlotCapacity); // Fixed: correct key name
 
         Log.d("BookingData", "Proceeding with: school_id=" + schoolId +
                 ", department_id=" + departmentId +
                 ", date_slot_id=" + selectedDateSlotId +
-                ", time_slot_id=" + selectedTimeSlotId);
+                ", time_slot_id=" + selectedTimeSlotId +
+                ", capacity=" + selectedTimeSlotCapacity);
 
         startActivity(intent);
     }

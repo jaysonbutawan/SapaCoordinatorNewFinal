@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -39,6 +40,7 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
     private int departmentId;
     private int dateSlotId;
     private int timeSlotId;
+    private int maxCapacity = 10; // Default capacity, will be updated from intent
 
     private TextView tvSlotCount;
     private TextView tvRemainingSlots;
@@ -49,7 +51,6 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
 
     private BookingStudentAdapter adapter;
     private List<Student> studentList = new ArrayList<>();
-    private int maxCapacity = 10; // Default capacity
     private int selectedCount = 0;
 
     @SuppressLint("MissingInflatedId")
@@ -69,6 +70,7 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         departmentId = getIntent().getIntExtra("department_id", -1);
         dateSlotId = getIntent().getIntExtra("date_slot_id", -1);
         timeSlotId = getIntent().getIntExtra("time_slot_id", -1);
+        maxCapacity = getIntent().getIntExtra("time_slot_capacity", 10); // Get actual capacity
 
         // Log the received data
         Log.d("DEBUG_", "Received booking data:");
@@ -76,6 +78,7 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         Log.d("DEBUG_", "Department ID: " + departmentId);
         Log.d("DEBUG_", "Date Slot ID: " + dateSlotId);
         Log.d("DEBUG_", "Time Slot ID: " + timeSlotId);
+        Log.d("DEBUG_", "Max Capacity: " + maxCapacity);
 
         // Initialize views
         initializeViews();
@@ -83,7 +86,15 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         // Validate booking data
         if (!isBookingDataValid()) {
             Log.e("DEBUG_", "Invalid booking data received");
-            finish();
+            new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Invalid Data!")
+                    .setContentText("Some booking information is missing. Please go back and try again.")
+                    .setConfirmText("OK")
+                    .setConfirmClickListener(dialog -> {
+                        dialog.dismissWithAnimation();
+                        finish();
+                    })
+                    .show();
             return;
         }
 
@@ -91,7 +102,6 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         setupRecyclerView();
 
         // Load data
-        loadTimeSlotCapacity();
         loadAvailableStudents();
     }
 
@@ -119,21 +129,13 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
 
     private void setupRecyclerView() {
         adapter = new BookingStudentAdapter(this, studentList, this);
+        adapter.setMaxSelections(maxCapacity); // Set the actual capacity from the time slot
         rvAvailableStudent.setLayoutManager(new LinearLayoutManager(this));
         rvAvailableStudent.setAdapter(adapter);
     }
 
     private boolean isBookingDataValid() {
         return schoolId != -1 && departmentId != -1 && dateSlotId != -1 && timeSlotId != -1;
-    }
-
-    private void loadTimeSlotCapacity() {
-        // TODO: Replace with actual API call to get time slot capacity
-        // For now, using default capacity
-        Log.d("DEBUG_", "Loading time slot capacity for time slot ID: " + timeSlotId);
-        maxCapacity = 10; // This should come from API
-        adapter.setMaxSelections(maxCapacity);
-        updateUI();
     }
 
     private void loadAvailableStudents() {
@@ -151,7 +153,7 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         ApiInterface api = ApiClient.getClient().create(ApiInterface.class);
         Call<List<Student>> call = api.getStudents(userId, schoolId);
 
-        call.enqueue(new Callback<List<Student>>() {
+        call.enqueue(new Callback<>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(@NonNull Call<List<Student>> call, @NonNull Response<List<Student>> response) {
@@ -188,7 +190,11 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
 
     @Override
     public void onSelectionLimitReached(int maxLimit) {
-        Toast.makeText(this, "Maximum " + maxLimit + " students can be selected", Toast.LENGTH_LONG).show();
+        new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Selection Limit Reached!")
+                .setContentText("Maximum " + maxLimit + " students can be selected for this time slot.\n\nPlease deselect some students before selecting others.")
+                .setConfirmText("OK")
+                .show();
     }
 
     @SuppressLint("SetTextI18n")
@@ -233,11 +239,11 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         Log.d("DEBUG_", "Selected students: " + selectedStudentIds.size());
         Log.d("DEBUG_", "Student IDs: " + selectedStudentIds.toString());
 
-        // ✅ Show loading state
+        // Show loading state
         btnContinueBooking.setEnabled(false);
         btnContinueBooking.setText("Submitting Booking...");
 
-        // ✅ We need to get hospital_id from department data
+        // We need to get hospital_id from department data
         // For now, we'll use department_id as hospital_id (you may need to adjust this based on your data structure)
         int hospitalId = departmentId; // This might need to be adjusted based on your actual data relationship
 
@@ -248,27 +254,17 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         Log.d("DEBUG_", "  department_id: " + departmentId);
         Log.d("DEBUG_", "  date_slot_id: " + dateSlotId);
 
-        // ✅ Submit booking to API - call BookAppointment procedure for each student
-        submitBookingForStudents(new ArrayList<>(selectedStudentIds), hospitalId);
+        // Submit booking to API - send all students at once
+        submitBookingForAllStudents(new ArrayList<>(selectedStudentIds), hospitalId);
     }
 
-    private void submitBookingForStudents(List<Integer> studentIds, int hospitalId) {
-        if (studentIds.isEmpty()) {
-            // All students processed successfully
-            showBookingSuccessDialog();
-            return;
-        }
-
-        // Process one student at a time using the BookAppointment procedure
-        int currentStudentId = studentIds.get(0);
-        studentIds.remove(0); // Remove the current student from the list
-
+    private void submitBookingForAllStudents(List<Integer> studentIds, int hospitalId) {
         ApiInterface api = ApiClient.getClient().create(ApiInterface.class);
         Call<GenericResponse> call = api.bookAppointment(
                 schoolId,
                 hospitalId,
                 timeSlotId,
-                currentStudentId
+                studentIds // Send all student IDs at once
         );
 
         call.enqueue(new Callback<>() {
@@ -277,14 +273,29 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
                 if (response.isSuccessful() && response.body() != null) {
                     GenericResponse genericResponse = response.body();
 
-                    if (genericResponse.isSuccess()) {
-                        Log.e("DEBUG_", "Code: " + response.code());
-                        Log.d("DEBUG_", "Student " + currentStudentId + " booked successfully");
-                        // Continue with the next student
-                        submitBookingForStudents(studentIds, hospitalId);
+                    // Add debug logging to see the actual response
+                    Log.d("DEBUG_", "Response received:");
+                    Log.d("DEBUG_", "Raw response: " + new Gson().toJson(genericResponse));
+                    Log.d("DEBUG_", "Status: " + response.code());
+                    Log.d("DEBUG_", "Message: " + genericResponse.getMessage());
+                    Log.d("DEBUG_", "isSuccess(): " + genericResponse.isSuccess());
+
+                    // Check for success using multiple conditions
+                    boolean isSuccessful = genericResponse.isSuccess() ||
+                                         (genericResponse.getMessage() != null &&
+                                          genericResponse.getMessage().toLowerCase().contains("success")) ||
+                                         (genericResponse.getMessage() != null &&
+                                          genericResponse.getMessage().toLowerCase().contains("booked"));
+
+                    if (isSuccessful) {
+                        Log.d("DEBUG_", "Booking successful for all students");
+                        Log.d("DEBUG_", "Response: " + genericResponse.getMessage());
+                        showBookingSuccessDialog();
                     } else {
-                        // Booking failed for this student
-                        handleBookingError("Booking failed for student ID " + currentStudentId + ": " + genericResponse.getMessage());
+                        // Booking failed
+                        Log.d("DEBUG_", "Booking failed - Status check failed");
+                        Log.d("DEBUG_", "Message received: " + genericResponse.getMessage());
+                        handleBookingError("Booking failed: " + genericResponse.getMessage());
                     }
                 } else {
                     handleBookingError("API response failed: " + response.code() + " - " + response.message());
@@ -304,28 +315,32 @@ public class SelectStudentActivity extends AppCompatActivity implements BookingS
         btnContinueBooking.setEnabled(true);
 
         Log.e("DEBUG_", errorMessage);
-        Toast.makeText(SelectStudentActivity.this,
-                "Booking failed: " + errorMessage,
-                Toast.LENGTH_LONG).show();
+
+        // Use SweetAlertDialog for error message
+        new SweetAlertDialog(SelectStudentActivity.this, SweetAlertDialog.ERROR_TYPE)
+                .setTitleText("Booking Failed!")
+                .setContentText("Unable to complete your booking request.\n\n" +
+                        errorMessage + "\n\n")
+                .setConfirmText("OK")
+                .show();
     }
 
-    // ✅ Show success dialog with booking details
+    // Show success dialog with booking details
     private void showBookingSuccessDialog() {
         // Reset button state
         btnContinueBooking.setText("Continue to Final Booking");
         btnContinueBooking.setEnabled(true);
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle("Booking Successful! ✅")
-                .setMessage("Your appointments have been submitted successfully!\n\n" +
-                        "Students: " + selectedCount + " selected\n" +
-                        "Status: Pending\n\n" +
-                        "You will be notified when the hospital responds to your request.")
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // ✅ Navigate back to main screen
-                    finish(); // This will close the SelectStudentActivity
+        new SweetAlertDialog(SelectStudentActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                .setTitleText("Booking Successful!")
+                .setContentText("Appointments have been submitted successfully! 🎉\n\n" +
+                        "📊 Students Selected: " + selectedCount + "\n" +
+                        "You will receive a notification once the hospital responds to your booking request.")
+                .setConfirmText("Great!")
+                .setConfirmClickListener(sweetAlertDialog -> {
+                    sweetAlertDialog.dismissWithAnimation();
+                    finish();
                 })
-                .setCancelable(false)
                 .show();
     }
 }

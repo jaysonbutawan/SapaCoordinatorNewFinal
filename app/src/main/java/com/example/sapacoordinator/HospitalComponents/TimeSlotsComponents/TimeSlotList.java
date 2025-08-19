@@ -79,6 +79,7 @@ public class TimeSlotList extends Fragment {
         }
 
         // clear current slots while fetching new ones
+        timeSlotList.clear(); // Clear the main list
         adapter.updateData(new ArrayList<>());
 
         Call<List<TimeSlotItem>> call = api.getTimeSlots(dateSlotId);
@@ -93,6 +94,8 @@ public class TimeSlotList extends Fragment {
                         showMessage("No timeslot found for this date", true);
                     } else {
                         showMessage("", false);
+                        timeSlotList.clear(); // Clear the main list
+                        timeSlotList.addAll(newSlots); // Update the main list
                         adapter.updateData(newSlots); // ✅ refresh adapter with new slots
                     }
 
@@ -129,6 +132,16 @@ public class TimeSlotList extends Fragment {
         if (callback != null) {
             callback.onTimeSlotSelected(timeSlotId);
         }
+    }
+
+    // ✅ Method to get the capacity of a selected time slot
+    public int getSelectedTimeSlotCapacity(int timeSlotId) {
+        for (TimeSlotItem timeSlot : timeSlotList) {
+            if (timeSlot.getTime_slot_id() == timeSlotId) {
+                return timeSlot.getCapacity();
+            }
+        }
+        return 10; // Default capacity if not found
     }
 
     public interface OnTimeSlotSelectedListener {
